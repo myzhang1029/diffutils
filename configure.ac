@@ -66,50 +66,16 @@ if test "$gl_gcc_warnings" = yes; then
 
   nw=
   # This, $nw, is the list of warnings we disable.
-  nw="$nw -Wdeclaration-after-statement" # too useful to forbid
-  nw="$nw -Waggregate-return"       # anachronistic
-  nw="$nw -Wlong-long"              # C90 is anachronistic (lib/gethrxtime.h)
-  nw="$nw -Wc++-compat"             # We don't care about C++ compilers
-  nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
-  nw="$nw -Wtraditional"            # Warns on #elif which we use often
-  nw="$nw -Wcast-qual"              # Too many warnings for now
-  nw="$nw -Wconversion"             # Too many warnings for now
-  nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
-  nw="$nw -Wsign-conversion"        # Too many warnings for now
-  nw="$nw -Wtraditional-conversion" # Too many warnings for now
-  nw="$nw -Wunreachable-code"       # Too many warnings for now
-  nw="$nw -Wpadded"                 # Our structs are not padded
-  nw="$nw -Wredundant-decls"        # openat.h declares e.g., mkdirat
-  nw="$nw -Wlogical-op"             # any use of fwrite provokes this
-  nw="$nw -Wformat-nonliteral"      # who.c and pinky.c strftime uses
-  nw="$nw -Wnested-externs"         # use of XARGMATCH/verify_function__
-  nw="$nw -Wswitch-enum"            # Too many warnings for now
-  nw="$nw -Wswitch-default"         # Too many warnings for now
-  nw="$nw -Wstack-protector"        # not worth working around
-  # things I might fix soon:
-  nw="$nw -Wfloat-equal"            # sort.c, seq.c
-  nw="$nw -Wmissing-format-attribute" # copy.c
-  nw="$nw -Wunsafe-loop-optimizations" # a few src/*.c
   nw="$nw -Winline"                 # system.h's readdir_ignoring_dot_and_dotdot
-  nw="$nw -Wstrict-overflow"        # expr.c, pr.c, tr.c, factor.c
-  nw="$nw -Wformat-extra-args"      # sdiff.c
-  # ?? -Wstrict-overflow
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT([ws], [$ws], [$nw])
   for w in $ws; do
     gl_WARN_ADD([$w])
   done
-  gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-format-nonliteral])
-  gl_WARN_ADD([-Wno-cast-function-type]) # For sig-handler.h:47
-
-  # In spite of excluding -Wlogical-op above, it is enabled, as of
-  # gcc 4.5.0 20090517, and it provokes warnings in cat.c, dd.c, truncate.c
-  gl_WARN_ADD([-Wno-logical-op])
 
   gl_WARN_ADD([-fdiagnostics-show-option])
   gl_WARN_ADD([-funit-at-a-time])
@@ -126,9 +92,16 @@ if test "$gl_gcc_warnings" = yes; then
   # Remove the following and save the result in GNULIB_WARN_CFLAGS.
   nw=
   nw="$nw -Wunused-macros"
-  nw="$nw -Wmissing-prototypes"
-  nw="$nw -Wold-style-definition"
   nw="$nw -Wsuggest-attribute=pure"
+  nw="$nw -Wduplicated-branches"    # Too many false alarms
+
+  gl_WARN_ADD([-Wno-return-local-addr])    # avoid this false alarm:
+  # careadlinkat.c: In function 'careadlinkat':
+  # cc1: error: function may return address of local variable [-Werror=return-local-addr]
+  # careadlinkat.c:73:8: note: declared here
+  #    73 |   char stack_buf[1024];
+  #          |        ^~~~~~~~~
+
   gl_MANYWARN_COMPLEMENT([GNULIB_WARN_CFLAGS], [$WARN_CFLAGS], [$nw])
   AC_SUBST([GNULIB_WARN_CFLAGS])
 fi
