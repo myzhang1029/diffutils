@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 lib/argmatch.c
+lib/argmatch.h
 lib/c-stack.c
 lib/error.c
 lib/file-type.c
@@ -25,7 +26,6 @@ lib/regcomp.c
 lib/xalloc-die.c
 lib/xfreopen.c
 lib/xstdopen.c
-lib/xstrtol-error.c
 lib/version-etc.c
 
 src/analyze.c
