@@ -33,7 +33,8 @@ bin_dir = ../src
 $(dist_man1_MANS): $(SRC_VERSION_C) help2man
 	$(AM_V_GEN)base=`expr $@ : '\(.*\).1'`				\
 	  && test -x $(bin_dir)/$$base					\
-	  && (echo '[NAME]' && sed 's@/\* *@@; s/-/\\-/; q' $S/$$base.c) \
+	  && (echo '[NAME]'						\
+              && sed 's@/\* *@@; s/-/\\-/;s/^GNU//; q' $S/$$base.c)	\
 	     | PATH="$(bin_dir)$(PATH_SEPARATOR)$$PATH"			\
 	       $(srcdir)/help2man -i - -i $(srcdir)/$$base.x		\
 		 -S '$(PACKAGE) $(VERSION)' $$base > $@-t && mv $@-t $@
