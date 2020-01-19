@@ -766,8 +766,8 @@ or @option{-u} option.
 The argument @var{lines} is the number of lines of context to show.
 When it is not given, it defaults to three.
 
-At present, only GNU @command{diff} can produce this format and
-only GNU @command{patch} can automatically apply diffs in this
+In the early 1990s, only GNU @command{diff} could produce this format and
+only GNU @command{patch} could automatically apply diffs in this
 format.  For proper operation, @command{patch} typically needs at
 least three lines of context.
 
