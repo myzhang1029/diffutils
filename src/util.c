@@ -217,6 +217,7 @@ process_signals (void)
       sig = interrupt_signal;
       stops = stop_signal_count;
 
+#ifdef SIGSTOP
       /* SIGTSTP is special, since the application can receive that signal
          more than once.  In this case, don't set the signal handler to the
          default.  Instead, just raise the uncatchable SIGSTOP.  */
@@ -226,6 +227,7 @@ process_signals (void)
           sig = SIGSTOP;
         }
       else
+#endif
         signal (sig, SIG_DFL);
 
       /* Exit or suspend the program.  */
@@ -243,11 +245,29 @@ install_signal_handlers (void)
   /* The signals that are trapped, and the number of such signals.  */
   static int const sig[] =
     {
+#ifdef SIGTSTP
       /* This one is handled specially.  */
       SIGTSTP,
-
+#endif
+#ifdef SIGALRM
       /* The usual suspects.  */
-      SIGALRM, SIGHUP, SIGINT, SIGPIPE, SIGQUIT, SIGTERM,
+      SIGALRM,
+#endif
+#ifdef SIGHUP
+      SIGHUP,
+#endif
+#ifdef SIGINT
+      SIGINT,
+#endif
+#ifdef SIGPIPE
+      SIGPIPE,
+#endif
+#ifdef SIGQUIT
+      SIGQUIT,
+#endif
+#ifdef SIGTERM
+      SIGTERM,
+#endif
 #ifdef SIGPOLL
       SIGPOLL,
 #endif
@@ -288,7 +308,11 @@ install_signal_handlers (void)
     for (j = 0; j < nsigs; j++)
       if (sigismember (&caught_signals, sig[j]))
         {
+#ifdef SIGTSTP
           act.sa_handler = sig[j] == SIGTSTP ? stophandler : sighandler;
+#else
+          act.sa_handler = sig[j] == sighandler;
+#endif
           sigaction (sig[j], &act, NULL);
         }
 #else
@@ -297,7 +321,11 @@ install_signal_handlers (void)
         caught_sig[j] = (signal (sig[j], SIG_IGN) != SIG_IGN);
         if (caught_sig[j])
           {
+#ifdef SIGTSTP
             signal (sig[j], sig[j] == SIGTSTP ? stophandler : sighandler);
+#else
+            signal (sig[j], sighandler);
+#endif
             siginterrupt (sig[j], 0);
           }
       }
